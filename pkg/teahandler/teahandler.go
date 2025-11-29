@@ -3,7 +3,6 @@ package teahandler
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/viewport"
@@ -11,6 +10,7 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/ssh"
+	"github.com/vinayakankugoyal/sshresume/pkg/config"
 )
 
 const (
@@ -259,17 +259,17 @@ func (m model) View() string {
 	return centered
 }
 
-// NewHandler creates a new bubbletea handler with the specified content directory
-func NewHandler(contentDir string) func(ssh.Session) (tea.Model, []tea.ProgramOption) {
+// NewHandler creates a new bubbletea handler with the specified configuration
+func NewHandler(cfg *config.Config) func(ssh.Session) (tea.Model, []tea.ProgramOption) {
 	return func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 		pty, _, _ := s.Pty()
 
-		tabs := []string{"Education", "Work", "Skills", "Talks"}
-		tabFiles := []string{
-			filepath.Join(contentDir, "education.md"),
-			filepath.Join(contentDir, "work.md"),
-			filepath.Join(contentDir, "skills.md"),
-			filepath.Join(contentDir, "talks.md"),
+		// Extract tab names and files from config
+		tabs := make([]string, len(cfg.Tabs))
+		tabFiles := make([]string, len(cfg.Tabs))
+		for i, tab := range cfg.Tabs {
+			tabs[i] = tab.Name
+			tabFiles[i] = tab.File
 		}
 
 		m := model{
@@ -277,10 +277,10 @@ func NewHandler(contentDir string) func(ssh.Session) (tea.Model, []tea.ProgramOp
 			TabFiles: tabFiles,
 			width:    pty.Window.Width,
 			height:   pty.Window.Height,
-			name:     "Vinayak Goyal",
-			email:    "vinayaklovespizza@gmail.com",
-			github:   "github.com/vinayakankugoyal",
-			linkedin: "linkedin.com/in/vinayakgoyal",
+			name:     cfg.Profile.Name,
+			email:    cfg.Profile.Email,
+			github:   cfg.Profile.GitHub,
+			linkedin: cfg.Profile.LinkedIn,
 		}
 
 		return m, []tea.ProgramOption{tea.WithAltScreen()}

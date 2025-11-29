@@ -19,23 +19,30 @@ import (
 	"github.com/charmbracelet/wish/activeterm"
 	"github.com/charmbracelet/wish/bubbletea"
 	"github.com/charmbracelet/wish/logging"
+	"github.com/vinayakankugoyal/sshresume/pkg/config"
 	"github.com/vinayakankugoyal/sshresume/pkg/teahandler"
 )
 
 var (
 	host       = flag.String("host", "localhost", "address to bind to")
 	port       = flag.String("port", "23234", "port to bind to")
-	contentDir = flag.String("content-dir", ".", "directory containing markdown files")
+	configPath = flag.String("config", "config.yaml", "path to config file")
 )
 
 func main() {
 	flag.Parse()
 
+	// Load configuration
+	cfg, err := config.Load(*configPath)
+	if err != nil {
+		log.Fatal("Failed to load config", "error", err)
+	}
+
 	s, err := wish.NewServer(
 		wish.WithAddress(net.JoinHostPort(*host, *port)),
 		wish.WithHostKeyPath(".ssh/id_ed25519"),
 		wish.WithMiddleware(
-			bubbletea.Middleware(teahandler.NewHandler(*contentDir)),
+			bubbletea.Middleware(teahandler.NewHandler(cfg)),
 			activeterm.Middleware(), // Bubble Tea apps usually require a PTY.
 			logging.Middleware(),
 		),

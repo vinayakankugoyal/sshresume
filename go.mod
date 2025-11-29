@@ -10,6 +10,7 @@ require (
 	github.com/charmbracelet/log v0.4.2
 	github.com/charmbracelet/ssh v0.0.0-20250826160808-ebfa259c7309
 	github.com/charmbracelet/wish v1.4.7
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
