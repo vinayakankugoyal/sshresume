@@ -1,14 +1,20 @@
-.PHONY: build run clean test install
+.PHONY: build run clean test install build-linux-arm64
 
 # Binary name
 BINARY_NAME=sshresume
 OUTPUT_DIR=bin
 
-# Build the application
+# Build the application for current platform
 build:
 	@echo "Building $(BINARY_NAME)..."
 	@mkdir -p $(OUTPUT_DIR)
 	go build -o $(OUTPUT_DIR)/$(BINARY_NAME) ./cmd/sshresume
+
+# Build for Linux AMD64
+build-linux-amd64:
+	@echo "Building $(BINARY_NAME) for Linux AMD64..."
+	@mkdir -p $(OUTPUT_DIR)/linux/amd64
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $(OUTPUT_DIR)/linux/amd64/$(BINARY_NAME) ./cmd/sshresume
 
 # Run the application
 run: build
@@ -24,6 +30,7 @@ dev:
 clean:
 	@echo "Cleaning build artifacts..."
 	@rm -rf $(OUTPUT_DIR)
+	@rm -rf .ssh
 
 # Install dependencies
 install:
@@ -40,17 +47,3 @@ fmt:
 lint:
 	@echo "Running linter..."
 	golangci-lint run
-
-# Display help
-help:
-	@echo "Available commands:"
-	@echo "  make build       - Build the binary to $(OUTPUT_DIR)/$(BINARY_NAME)"
-	@echo "  make run         - Build and run the server (localhost:23234)"
-	@echo "  make run-custom  - Run with custom HOST and PORT (e.g., make run-custom HOST=0.0.0.0 PORT=2222)"
-	@echo "  make dev         - Run directly with 'go run' (faster for development)"
-	@echo "  make clean       - Remove build artifacts"
-	@echo "  make test        - Run tests"
-	@echo "  make install     - Install/update dependencies"
-	@echo "  make fmt         - Format code"
-	@echo "  make lint        - Run linter"
-	@echo "  make help        - Show this help message"

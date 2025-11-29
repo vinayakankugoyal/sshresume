@@ -3,6 +3,7 @@ package teahandler
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/viewport"
@@ -94,7 +95,7 @@ func (m model) updateViewportContent() model {
 
 	// Create renderer with proper width
 	renderer, _ := glamour.NewTermRenderer(
-		glamour.WithAutoStyle(),
+		glamour.WithStylePath("dark"),
 		glamour.WithWordWrap(contentWidth),
 	)
 
@@ -119,7 +120,7 @@ func tabGapBorder() lipgloss.Border {
 
 var (
 	docStyle       = lipgloss.NewStyle().Padding(1, 2, 1, 2)
-	highlightColor = lipgloss.AdaptiveColor{Light: "#874BFD", Dark: "#7D56F4"}
+	highlightColor = lipgloss.Color("#7D56F4")
 	tabGapStyle    = lipgloss.NewStyle().Border(tabGapBorder(), true).BorderForeground(highlightColor)
 	windowStyle    = lipgloss.NewStyle().BorderForeground(highlightColor).Padding(2, 2).Border(lipgloss.NormalBorder()).UnsetBorderTop()
 )
@@ -258,22 +259,30 @@ func (m model) View() string {
 	return centered
 }
 
-func Handler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
-	pty, _, _ := s.Pty()
+// NewHandler creates a new bubbletea handler with the specified content directory
+func NewHandler(contentDir string) func(ssh.Session) (tea.Model, []tea.ProgramOption) {
+	return func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
+		pty, _, _ := s.Pty()
 
-	tabs := []string{"Education", "Work Experience", "Skills", "Talks"}
-	tabFiles := []string{"education.md", "work.md", "skills.md", "talks.md"}
+		tabs := []string{"Education", "Work", "Skills", "Talks"}
+		tabFiles := []string{
+			filepath.Join(contentDir, "education.md"),
+			filepath.Join(contentDir, "work.md"),
+			filepath.Join(contentDir, "skills.md"),
+			filepath.Join(contentDir, "talks.md"),
+		}
 
-	m := model{
-		Tabs:     tabs,
-		TabFiles: tabFiles,
-		width:    pty.Window.Width,
-		height:   pty.Window.Height,
-		name:     "Vinayak Goyal",
-		email:    "vinayaklovespizza@gmail.com",
-		github:   "github.com/vinayakankugoyal",
-		linkedin: "linkedin.com/in/vinayakgoyal",
+		m := model{
+			Tabs:     tabs,
+			TabFiles: tabFiles,
+			width:    pty.Window.Width,
+			height:   pty.Window.Height,
+			name:     "Vinayak Goyal",
+			email:    "vinayaklovespizza@gmail.com",
+			github:   "github.com/vinayakankugoyal",
+			linkedin: "linkedin.com/in/vinayakgoyal",
+		}
+
+		return m, []tea.ProgramOption{tea.WithAltScreen()}
 	}
-
-	return m, []tea.ProgramOption{tea.WithAltScreen()}
 }

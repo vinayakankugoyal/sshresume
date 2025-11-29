@@ -23,16 +23,19 @@ import (
 )
 
 var (
-	host = flag.String("host", "localhost", "address to bind to")
-	port = flag.String("port", "23234", "port to bind to")
+	host       = flag.String("host", "localhost", "address to bind to")
+	port       = flag.String("port", "23234", "port to bind to")
+	contentDir = flag.String("content-dir", ".", "directory containing markdown files")
 )
 
 func main() {
+	flag.Parse()
+
 	s, err := wish.NewServer(
 		wish.WithAddress(net.JoinHostPort(*host, *port)),
 		wish.WithHostKeyPath(".ssh/id_ed25519"),
 		wish.WithMiddleware(
-			bubbletea.Middleware(teahandler.Handler),
+			bubbletea.Middleware(teahandler.NewHandler(*contentDir)),
 			activeterm.Middleware(), // Bubble Tea apps usually require a PTY.
 			logging.Middleware(),
 		),
