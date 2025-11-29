@@ -1,4 +1,4 @@
-module sshresume
+module github.com/vinayakankugoyal/sshresume
 
 go 1.25.3
 

@@ -1,90 +1,21 @@
-package main
-
-// An example Bubble Tea server. This will put an ssh session into alt screen
-// and continually print up to date terminal information.
+package teahandler
 
 import (
-	"context"
-	"errors"
 	"fmt"
-	"net"
 	"os"
-	"os/signal"
 	"strings"
-	"syscall"
-	"time"
 
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/log"
 	"github.com/charmbracelet/ssh"
-	"github.com/charmbracelet/wish"
-	"github.com/charmbracelet/wish/activeterm"
-	"github.com/charmbracelet/wish/bubbletea"
-	"github.com/charmbracelet/wish/logging"
 )
 
 const (
-	host      = "localhost"
-	port      = "23234"
 	appWidth  = 78
 	appHeight = 30
 )
-
-func main() {
-	s, err := wish.NewServer(
-		wish.WithAddress(net.JoinHostPort(host, port)),
-		wish.WithHostKeyPath(".ssh/id_ed25519"),
-		wish.WithMiddleware(
-			bubbletea.Middleware(teaHandler),
-			activeterm.Middleware(), // Bubble Tea apps usually require a PTY.
-			logging.Middleware(),
-		),
-	)
-	if err != nil {
-		log.Error("Could not start server", "error", err)
-	}
-
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	log.Info("Starting SSH server", "host", host, "port", port)
-	go func() {
-		if err = s.ListenAndServe(); err != nil && !errors.Is(err, ssh.ErrServerClosed) {
-			log.Error("Could not start server", "error", err)
-			done <- nil
-		}
-	}()
-
-	<-done
-	log.Info("Stopping SSH server")
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer func() { cancel() }()
-	if err := s.Shutdown(ctx); err != nil && !errors.Is(err, ssh.ErrServerClosed) {
-		log.Error("Could not stop server", "error", err)
-	}
-}
-
-func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
-	pty, _, _ := s.Pty()
-
-	tabs := []string{"Education", "Work Experience", "Skills", "Talks"}
-	tabFiles := []string{"education.md", "work.md", "skills.md", "talks.md"}
-
-	m := model{
-		Tabs:     tabs,
-		TabFiles: tabFiles,
-		width:    pty.Window.Width,
-		height:   pty.Window.Height,
-		name:     "Vinayak Goyal",
-		email:    "vinayaklovespizza@gmail.com",
-		github:   "github.com/vinayakankugoyal",
-		linkedin: "linkedin.com/in/vinayakgoyal",
-	}
-
-	return m, []tea.ProgramOption{tea.WithAltScreen()}
-}
 
 type model struct {
 	Tabs      []string
@@ -94,7 +25,6 @@ type model struct {
 	height    int
 	name      string
 	email     string
-	phone     string
 	github    string
 	linkedin  string
 	viewport  viewport.Model
@@ -326,4 +256,24 @@ func (m model) View() string {
 	output := doc.String()
 	centered := lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, docStyle.Render(output))
 	return centered
+}
+
+func Handler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
+	pty, _, _ := s.Pty()
+
+	tabs := []string{"Education", "Work Experience", "Skills", "Talks"}
+	tabFiles := []string{"education.md", "work.md", "skills.md", "talks.md"}
+
+	m := model{
+		Tabs:     tabs,
+		TabFiles: tabFiles,
+		width:    pty.Window.Width,
+		height:   pty.Window.Height,
+		name:     "Vinayak Goyal",
+		email:    "vinayaklovespizza@gmail.com",
+		github:   "github.com/vinayakankugoyal",
+		linkedin: "linkedin.com/in/vinayakgoyal",
+	}
+
+	return m, []tea.ProgramOption{tea.WithAltScreen()}
 }
