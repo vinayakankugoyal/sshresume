@@ -39,7 +39,7 @@ func (m model) Init() tea.Cmd {
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
-	// Initialize viewport on first update
+	// Initialize viewport on first update.
 	if !m.ready {
 		contentBoxWidth := appWidth - docStyle.GetHorizontalFrameSize() - 2
 		m.viewport = viewport.New(contentBoxWidth, appHeight-10)
@@ -75,7 +75,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	// Pass other messages to viewport for scrolling (including arrow keys for scrolling)
+	// Pass other messages to viewport for scrolling (including arrow keys for scrolling).
 	if m.ready {
 		m.viewport, cmd = m.viewport.Update(msg)
 	}
@@ -83,17 +83,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) updateViewportContent() model {
-	// Read and render markdown content for the active tab
+	// Read and render markdown content for the active tab.
 	mdContent, err := os.ReadFile(m.TabFiles[m.activeTab])
 	if err != nil {
 		m.viewport.SetContent("Error reading file: " + err.Error())
 		return m
 	}
 
-	// Use fixed app width for content, accounting for outer padding and borders
+	// Use fixed app width for content, accounting for outer padding and borders.
 	contentWidth := appWidth - docStyle.GetHorizontalFrameSize() - windowStyle.GetHorizontalFrameSize()
 
-	// Create renderer with proper width
+	// Create renderer with proper width.
 	renderer, _ := glamour.NewTermRenderer(
 		glamour.WithStylePath("dark"),
 		glamour.WithWordWrap(contentWidth),
@@ -128,7 +128,7 @@ var (
 func (m model) View() string {
 	doc := strings.Builder{}
 
-	// Render header with name and contact details
+	// Render header with name and contact details.
 	nameStyle := lipgloss.NewStyle().
 		Bold(true).
 		Foreground(highlightColor).
@@ -155,14 +155,14 @@ func (m model) View() string {
 	doc.WriteString(headerStyle.Render(header))
 	doc.WriteString("\n\n")
 
-	// Calculate width for content box
+	// Calculate width for content box.
 	contentBoxWidth := appWidth - docStyle.GetHorizontalFrameSize() - 2
 
-	// Render tabs with position-specific borders
+	// Render tabs with position-specific borders.
 	var renderedTabs []string
 	for i, t := range m.Tabs {
 		isActive := i == m.activeTab
-		// Define border based on position and active state
+		// Define border based on position and active state.
 		border := lipgloss.RoundedBorder()
 
 		isFirst := i == 0
@@ -259,12 +259,12 @@ func (m model) View() string {
 	return centered
 }
 
-// NewHandler creates a new bubbletea handler with the specified configuration
+// NewHandler creates a new bubbletea handler with the specified configuration.
 func NewHandler(cfg *config.Config) func(ssh.Session) (tea.Model, []tea.ProgramOption) {
 	return func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 		pty, _, _ := s.Pty()
 
-		// Extract tab names and files from config
+		// Extract tab names and files from config.
 		tabs := make([]string, len(cfg.Tabs))
 		tabFiles := make([]string, len(cfg.Tabs))
 		for i, tab := range cfg.Tabs {

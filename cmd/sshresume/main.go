@@ -1,8 +1,5 @@
 package main
 
-// An example Bubble Tea server. This will put an ssh session into alt screen
-// and continually print up to date terminal information.
-
 import (
 	"context"
 	"errors"
@@ -32,7 +29,6 @@ var (
 func main() {
 	flag.Parse()
 
-	// Load configuration
 	cfg, err := config.Load(*configPath)
 	if err != nil {
 		log.Fatal("Failed to load config", "error", err)
