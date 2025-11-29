@@ -9,6 +9,6 @@ pkgs.mkShell {
         pkgs.lolcat
     ];
     shellHook = ''
-        echo "Hi!" | cowsay | lolcat
+        echo "sshresume" | cowsay | lolcat
     '';
 }

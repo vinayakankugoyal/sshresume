@@ -69,8 +69,8 @@ func main() {
 func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	pty, _, _ := s.Pty()
 
-	tabs := []string{"Education", "Work Experience", "Skills"}
-	tabFiles := []string{"education.md", "work.md", "skills.md"}
+	tabs := []string{"Education", "Work Experience", "Skills", "Talks"}
+	tabFiles := []string{"education.md", "work.md", "skills.md", "talks.md"}
 
 	m := model{
 		Tabs:     tabs,
@@ -234,8 +234,9 @@ func (m model) View() string {
 		// Define border based on position and active state
 		border := lipgloss.RoundedBorder()
 
-		switch t {
-		case "Education":
+		isFirst := i == 0
+
+		if isFirst {
 			if isActive {
 				border.BottomLeft = "│"
 				border.Bottom = " "
@@ -245,17 +246,7 @@ func (m model) View() string {
 				border.Bottom = "─"
 				border.BottomRight = "┴"
 			}
-		case "Work Experience":
-			if isActive {
-				border.BottomLeft = "┘"
-				border.Bottom = " "
-				border.BottomRight = "└"
-			} else {
-				border.BottomLeft = "┴"
-				border.Bottom = "─"
-				border.BottomRight = "┴"
-			}
-		case "Skills":
+		} else {
 			if isActive {
 				border.BottomLeft = "┘"
 				border.Bottom = " "
