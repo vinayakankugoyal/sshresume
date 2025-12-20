@@ -1,6 +1,9 @@
 # SSH keys
 .ssh
 
+# Go binary
+sshresume
+
 # Old binary
 main
 

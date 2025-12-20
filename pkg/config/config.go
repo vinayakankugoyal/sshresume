@@ -3,28 +3,25 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"sort"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
-// Tab represents a single tab configuration.
-type Tab struct {
-	Name string `yaml:"name"`
-	File string `yaml:"file"`
-}
-
-// Profile contains user profile information.
-type Profile struct {
-	Name     string `yaml:"name"`
-	Email    string `yaml:"email"`
-	GitHub   string `yaml:"github"`
-	LinkedIn string `yaml:"linkedin"`
+// TreeNode represents a file or directory in the tree structure.
+type TreeNode struct {
+	Name     string
+	Path     string
+	IsDir    bool
+	Children []*TreeNode
 }
 
 // Config represents the application configuration.
 type Config struct {
-	Profile Profile `yaml:"profile"`
-	Tabs    []Tab   `yaml:"tabs"`
+	Folder string `yaml:"folder"`
+	Tree   *TreeNode
 }
 
 // Load reads and parses a YAML config file.
@@ -44,27 +41,83 @@ func Load(path string) (*Config, error) {
 		return nil, err
 	}
 
+	// Build tree structure from folder.
+	tree, err := buildTree(config.Folder)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build tree: %w", err)
+	}
+	config.Tree = tree
+
 	return &config, nil
 }
 
 // Validate checks if the configuration is valid.
 func (c *Config) Validate() error {
-	if c.Profile.Name == "" {
-		return fmt.Errorf("profile.name is required")
+	if c.Folder == "" {
+		return fmt.Errorf("folder is required")
 	}
 
-	if len(c.Tabs) == 0 {
-		return fmt.Errorf("at least one tab is required")
+	// Check if folder exists.
+	info, err := os.Stat(c.Folder)
+	if err != nil {
+		return fmt.Errorf("folder does not exist: %w", err)
 	}
-
-	for i, tab := range c.Tabs {
-		if tab.Name == "" {
-			return fmt.Errorf("tabs[%d].name is required", i)
-		}
-		if tab.File == "" {
-			return fmt.Errorf("tabs[%d].file is required", i)
-		}
+	if !info.IsDir() {
+		return fmt.Errorf("folder must be a directory")
 	}
 
 	return nil
+}
+
+// buildTree recursively builds a tree structure from a directory.
+func buildTree(rootPath string) (*TreeNode, error) {
+	info, err := os.Stat(rootPath)
+	if err != nil {
+		return nil, err
+	}
+
+	node := &TreeNode{
+		Name:  filepath.Base(rootPath),
+		Path:  rootPath,
+		IsDir: info.IsDir(),
+	}
+
+	if info.IsDir() {
+		entries, err := os.ReadDir(rootPath)
+		if err != nil {
+			return nil, err
+		}
+
+		// Filter and sort entries.
+		var children []*TreeNode
+		for _, entry := range entries {
+			// Skip hidden files.
+			if strings.HasPrefix(entry.Name(), ".") {
+				continue
+			}
+
+			childPath := filepath.Join(rootPath, entry.Name())
+			childNode, err := buildTree(childPath)
+			if err != nil {
+				continue // Skip files that can't be read.
+			}
+
+			// Only include directories and markdown files.
+			if childNode.IsDir || strings.HasSuffix(childNode.Name, ".md") {
+				children = append(children, childNode)
+			}
+		}
+
+		// Sort: directories first, then files, alphabetically.
+		sort.Slice(children, func(i, j int) bool {
+			if children[i].IsDir != children[j].IsDir {
+				return children[i].IsDir
+			}
+			return children[i].Name < children[j].Name
+		})
+
+		node.Children = children
+	}
+
+	return node, nil
 }

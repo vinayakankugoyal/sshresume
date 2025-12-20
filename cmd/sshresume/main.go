@@ -23,7 +23,7 @@ import (
 var (
 	host       = flag.String("host", "localhost", "address to bind to")
 	port       = flag.String("port", "23234", "port to bind to")
-	configPath = flag.String("config", "config.yaml", "path to config file")
+	configPath = flag.String("config", "config.example.yaml", "path to config file")
 )
 
 func main() {
