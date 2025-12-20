@@ -218,8 +218,8 @@ func (m model) updateContent() model {
 	}
 
 	renderer, _ := glamour.NewTermRenderer(
-		glamour.WithAutoStyle(),
-		glamour.WithColorProfile(termenv.ANSI256),
+		glamour.WithStandardStyle("dark"),
+		glamour.WithColorProfile(termenv.TrueColor),
 		glamour.WithWordWrap(contentWidth),
 	)
 

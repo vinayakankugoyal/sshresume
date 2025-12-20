@@ -30,7 +30,7 @@ var (
 )
 
 func main() {
-	lipgloss.SetColorProfile(termenv.ANSI256)
+	lipgloss.SetColorProfile(termenv.TrueColor)
 	flag.Parse()
 
 	cfg, err := config.Load(*fileDir)
