@@ -73,33 +73,17 @@ Options:
         address to bind to (default "localhost")
   -port string
         port to bind to (default "23234")
-  -config string
-        path to config file (default "config.yaml")
+  -dir string
+        path to content directory (default "./")
 ```
 
 ## Configuration
 
-The application is configured using a YAML file (default `config.yaml`).
-
-### Setting Up Your Config File
-
-1. Create a `config.yaml` or copy the example:
-   ```bash
-   cp config.example.yaml config.yaml
-   ```
-
-2. Point the `folder` key to the directory containing your markdown files:
-
-   ```yaml
-   # config.yaml
-   
-   # Folder containing your markdown files (supports nested directories)
-   folder: "./content"
-   ```
+The application is configured by pointing it to a directory containing your markdown files using the `-dir` flag.
 
 ### Organizing Content
 
-The UI will automatically generate a navigation tree based on the directory structure pointed to by `folder`.
+The UI will automatically generate a navigation tree based on the directory structure.
 
 - **Directories** become expandable nodes in the sidebar.
 - **Markdown files (`.md`)** become selectable items.
@@ -117,6 +101,11 @@ content/
 │   ├── ProjectA.md
 │   └── ProjectB.md
 └── 04-Contact.md
+```
+
+To run with this structure:
+```bash
+./bin/sshresume -dir ./content
 ```
 
 ## Keyboard Shortcuts
@@ -162,8 +151,8 @@ On first run, the server will generate an SSH host key at `.ssh/id_ed25519` if i
 ## Deployment
 
 1. Build the binary for your target platform.
-2. Copy the binary, your config file, and your content folder to your server.
-3. Run the binary with appropriate host and port settings.
+2. Copy the binary and your content folder to your server.
+3. Run the binary with appropriate host and port settings, pointing it to your content folder.
 4. Configure your firewall to allow traffic on the SSH port.
 
 ### Example Systemd Service
@@ -177,7 +166,7 @@ After=network.target
 Type=simple
 User=youruser
 WorkingDirectory=/path/to/sshresume
-ExecStart=/path/to/sshresume/bin/sshresume -host 0.0.0.0 -port 23234 -config /path/to/config.yaml
+ExecStart=/path/to/sshresume/bin/sshresume -host 0.0.0.0 -port 23234 -dir /path/to/content
 Restart=on-failure
 
 [Install]

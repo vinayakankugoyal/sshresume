@@ -1,5 +1,0 @@
-# SSH Resume Configuration File
-# Copy this file to config.yaml and customize it with your information
-
-# Folder containing your markdown files (supports nested directories)
-folder: "./"

@@ -16,7 +16,7 @@ type TreeNode struct {
 	Children []*TreeNode
 }
 
-// Load reads and parses a YAML config file.
+// Load builds a tree structure from the specified directory.
 func Load(path string) (*TreeNode, error) {
 
 	info, err := os.Stat(path)
