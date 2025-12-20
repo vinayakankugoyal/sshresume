@@ -21,15 +21,15 @@ import (
 )
 
 var (
-	host       = flag.String("host", "localhost", "address to bind to")
-	port       = flag.String("port", "23234", "port to bind to")
-	configPath = flag.String("config", "config.example.yaml", "path to config file")
+	host    = flag.String("host", "localhost", "address to bind to")
+	port    = flag.String("port", "23234", "port to bind to")
+	fileDir = flag.String("dir", "./", "path to config file")
 )
 
 func main() {
 	flag.Parse()
 
-	cfg, err := config.Load(*configPath)
+	cfg, err := config.Load(*fileDir)
 	if err != nil {
 		log.Fatal("Failed to load config", "error", err)
 	}

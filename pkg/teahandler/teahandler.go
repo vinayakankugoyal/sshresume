@@ -331,16 +331,15 @@ func (m model) buildLipglossTree(node *config.TreeNode, currentIdx *int) *tree.T
 }
 
 // NewHandler creates a new bubbletea handler with the specified configuration.
-func NewHandler(cfg *config.Config) func(ssh.Session) (tea.Model, []tea.ProgramOption) {
+func NewHandler(tree *config.TreeNode) func(ssh.Session) (tea.Model, []tea.ProgramOption) {
 	return func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 		pty, _, _ := s.Pty()
 
 		m := model{
-			tree:     cfg.Tree,
+			tree:     tree,
 			expanded: make(map[string]bool),
 			width:    pty.Window.Width,
 			height:   pty.Window.Height,
-			name:     cfg.Name,
 			focused:  0, // Start focused on sidebar
 		}
 
