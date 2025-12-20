@@ -1,4 +1,4 @@
-.PHONY: build run clean test install build-linux-arm64 image local-image run-local-image
+.PHONY: build run clean test install build-linux-arm64 push local-image run-local-image
 
 # Binary name
 BINARY_NAME=sshresume
@@ -29,7 +29,7 @@ push:
 	docker buildx create --name sshresumebuilder --use
 	docker buildx inspect --bootstrap
 
-	docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE_REPO):$(TAG) -t $(IMAGE_REPO):latest --push .
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE_REPO):$(TAG) --push .
 
 local-image:
 	docker buildx rm sshresumebuilder || true

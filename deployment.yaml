@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssh-resume-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssh-resume
+  template:
+    metadata:
+      labels:
+        app: ssh-resume
+    spec:
+      containers:
+      - name: ssh-resume
+        image: us-central1-docker.pkg.dev/murd3rbot/sshresume/sshresume:20251220-8f0540d
+        args:
+        - --host
+        - 0.0.0.0
+        ports:
+        - containerPort: 23234
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssh-resume-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: ssh-resume
+  ports:
+    - protocol: TCP
+      port: 22           # External port (User types: ssh <IP>)
+      targetPort: 23234  # Internal port (Where the app is listening)
