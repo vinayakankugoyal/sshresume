@@ -21,5 +21,5 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /sshresume ./cmd
 FROM gcr.io/distroless/static-debian12
 WORKDIR /app
 COPY --from=builder /sshresume /app/sshresume
-COPY --from=builder /app/README.md /app/README.md
+COPY --from=builder /app/resume /app/resume
 ENTRYPOINT ["/app/sshresume"]

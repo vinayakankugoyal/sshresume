@@ -26,7 +26,7 @@ import (
 var (
 	host    = flag.String("host", "localhost", "address to bind to")
 	port    = flag.String("port", "23234", "port to bind to")
-	fileDir = flag.String("dir", "./", "path to config file")
+	fileDir = flag.String("dir", "./resume", "path to config file")
 )
 
 func main() {
