@@ -1,13 +1,14 @@
 # SSH Resume
 
-An interactive resume/portfolio accessible via SSH, built with Go and [Charm](https://charm.sh/) libraries. Present your professional information in a beautiful terminal UI that users can access by simply SSH-ing to your server.
+An interactive resume/portfolio accessible via SSH, built with Go and [Charm](https://charm.sh/) libraries. Present your professional information in a beautiful terminal UI with a file-tree navigation system that users can access by simply SSH-ing to your server.
 
 ## Features
 
-- 📄 **Interactive TUI** - Beautiful terminal user interface with tabbed navigation
-- 🎨 **Markdown Support** - Write content in markdown with syntax highlighting via Glamour
-- ⌨️ **Keyboard Navigation** - Navigate through tabs and scroll through content with keyboard shortcuts
-- 🔐 **SSH Server** - Self-hosted SSH server with automatic host key generation
+- 📂 **File-Tree Navigation** - Organize your content in a familiar directory structure with support for nested folders.
+- 📄 **Split-View Interface** - Clean split-pane layout with a sidebar for navigation and a main viewport for content.
+- 🎨 **Markdown Support** - Write content in markdown with syntax highlighting via [Glamour](https://github.com/charmbracelet/glamour).
+- ⌨️ **Keyboard Navigation** - Intuitive vim-like keybindings for browsing and reading.
+- 🔐 **SSH Server** - Self-hosted SSH server with automatic host key generation.
 
 ## Demo
 
@@ -76,70 +77,68 @@ Options:
         path to config file (default "config.yaml")
 ```
 
-### Example
-
-```bash
-# Run on custom host and port with a specific config file
-./bin/sshresume -host 0.0.0.0 -port 2222 -config ./myconfig.yaml
-```
-
 ## Configuration
+
+The application is configured using a YAML file (default `config.yaml`).
 
 ### Setting Up Your Config File
 
-1. Create a `config.yaml` with your information:
+1. Create a `config.yaml` or copy the example:
+   ```bash
+   cp config.example.yaml config.yaml
+   ```
 
-```yaml
-# Profile information displayed in the header
-profile:
-  name: "Your Name"
-  email: "your.email@example.com"
-  github: "github.com/yourusername"
-  linkedin: "linkedin.com/in/yourusername"
+2. Point the `folder` key to the directory containing your markdown files:
 
-# Tabs define the navigation structure
-# Each tab has a name (displayed in UI) and file (markdown file to render)
-tabs:
-  - name: "Education"
-    file: "education.md"
-  - name: "Work"
-    file: "work.md"
-  - name: "Skills"
-    file: "skills.md"
-  - name: "Talks"
-    file: "talks.md"
+   ```yaml
+   # config.yaml
+   
+   # Folder containing your markdown files (supports nested directories)
+   folder: "./content"
+   ```
+
+### Organizing Content
+
+The UI will automatically generate a navigation tree based on the directory structure pointed to by `folder`.
+
+- **Directories** become expandable nodes in the sidebar.
+- **Markdown files (`.md`)** become selectable items.
+- Hidden files/folders (starting with `.`) are ignored.
+- Items are sorted with directories first, then files alphabetically.
+
+**Example Structure:**
 ```
-
-### Customizing Tabs
-
-You can add, remove, or reorder tabs in the config file. Each tab requires:
-- `name`: The display name shown in the UI
-- `file`: Path to the markdown file (relative to where you run the binary, or absolute path)
-
-Example with custom tabs:
-```yaml
-tabs:
-  - name: "About"
-    file: "content/about.md"
-  - name: "Projects"
-    file: "content/projects.md"
-  - name: "Contact"
-    file: "content/contact.md"
+content/
+├── 01-About.md
+├── 02-Experience/
+│   ├── Job1.md
+│   └── Job2.md
+├── 03-Projects/
+│   ├── ProjectA.md
+│   └── ProjectB.md
+└── 04-Contact.md
 ```
-
-### Creating Content Files
-
-Create markdown files referenced in your config. The content is rendered with [Glamour](https://github.com/charmbracelet/glamour) and supports standard markdown syntax
 
 ## Keyboard Shortcuts
 
-When connected via SSH:
+| Key | Action |
+| :--- | :--- |
+| `Tab` | Toggle focus between Sidebar and Content |
+| `q` / `Ctrl+C` | Quit |
 
-- `↑/↓` or scroll - Scroll through content
-- `←/→` or `h/l` - Switch between tabs
-- `Tab/Shift+Tab` - Switch between tabs
-- `n/p` - Next/Previous tab
-- `q` or `Ctrl+C` - Quit
+### Sidebar Navigation (When Focused)
+| Key | Action |
+| :--- | :--- |
+| `j` / `↓` | Move cursor down |
+| `k` / `↑` | Move cursor up |
+| `Enter` / `Space` | Expand directory / Open file |
+
+### Content Navigation (When Focused)
+| Key | Action |
+| :--- | :--- |
+| `j` / `↓` | Scroll down |
+| `k` / `↑` | Scroll up |
+| `d` / `u` | Page down / Page up |
 
 ## Development
 
@@ -162,11 +161,10 @@ On first run, the server will generate an SSH host key at `.ssh/id_ed25519` if i
 
 ## Deployment
 
-1. Build the binary for your target platform
-2. Copy the binary and content files to your server
-3. Run the binary with appropriate host and port settings
-4. Configure your firewall to allow traffic on the SSH port
-5. (Optional) Set up a systemd service for automatic startup
+1. Build the binary for your target platform.
+2. Copy the binary, your config file, and your content folder to your server.
+3. Run the binary with appropriate host and port settings.
+4. Configure your firewall to allow traffic on the SSH port.
 
 ### Example Systemd Service
 
@@ -188,12 +186,12 @@ WantedBy=multi-user.target
 
 ## Technologies Used
 
-- [Go](https://golang.org/) - Programming language
+- [Go](https://golang.org/)
 - [Bubble Tea](https://github.com/charmbracelet/bubbletea) - TUI framework
 - [Glamour](https://github.com/charmbracelet/glamour) - Markdown rendering
-- [Lipgloss](https://github.com/charmbracelet/lipgloss) - Style definitions for terminal output
-- [Wish](https://github.com/charmbracelet/wish) - SSH server toolkit
-- [Bubbles](https://github.com/charmbracelet/bubbles) - TUI components (viewport)
+- [Lipgloss](https://github.com/charmbracelet/lipgloss) - Styling
+- [Wish](https://github.com/charmbracelet/wish) - SSH server
+- [Bubbles](https://github.com/charmbracelet/bubbles) - TUI components
 
 ## License
 
@@ -205,7 +203,3 @@ This project is open source and available under the MIT License.
 - Email: vinayaklovespizza@gmail.com
 - GitHub: [github.com/vinayakankugoyal](https://github.com/vinayakankugoyal)
 - LinkedIn: [linkedin.com/in/vinayakgoyal](https://linkedin.com/in/vinayakgoyal)
-
-## Acknowledgments
-
-Built with the amazing [Charm](https://charm.sh/) suite of libraries for building terminal applications.
