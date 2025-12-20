@@ -77,9 +77,6 @@ func buildTree(rootPath string) (*TreeNode, error) {
 
 		// Sort: directories first, then files, alphabetically.
 		sort.Slice(children, func(i, j int) bool {
-			if children[i].IsDir != children[j].IsDir {
-				return children[i].IsDir
-			}
 			return children[i].Name < children[j].Name
 		})
 

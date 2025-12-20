@@ -1,8 +1,11 @@
-.PHONY: build run clean test install build-linux-arm64
+.PHONY: build run clean test install build-linux-arm64 image local-image run-local-image
 
 # Binary name
 BINARY_NAME=sshresume
 OUTPUT_DIR=bin
+
+IMAGE_REPO=us-central1-docker.pkg.dev/murd3rbot/sshresume/sshresume
+TAG=$(shell date +%Y%m%d)-$(shell git rev-parse --short HEAD)
 
 # Build the application for current platform
 build:
@@ -20,6 +23,23 @@ build-linux-amd64:
 run: build
 	@echo "Starting SSH server..."
 	./$(OUTPUT_DIR)/$(BINARY_NAME)
+
+push:
+	docker buildx rm sshresumebuilder || true
+	docker buildx create --name sshresumebuilder --use
+	docker buildx inspect --bootstrap
+
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE_REPO):$(TAG) -t $(IMAGE_REPO):latest --push .
+
+local-image:
+	docker buildx rm sshresumebuilder || true
+	docker buildx create --name sshresumebuilder --use
+	docker buildx inspect --bootstrap
+
+	docker buildx build --platform linux/arm64 -t $(IMAGE_REPO):$(TAG) -t $(IMAGE_REPO):latest --load .
+
+run-local-image: local-image
+	docker run --rm -it -p 23234:23234 $(IMAGE_REPO):latest --host 0.0.0.0
 
 # Run directly without building (uses go run)
 dev:
