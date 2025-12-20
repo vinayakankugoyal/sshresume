@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/tree"
 	"github.com/charmbracelet/ssh"
+	"github.com/muesli/termenv"
 	"github.com/vinayakankugoyal/sshresume/pkg/config"
 )
 
@@ -218,6 +219,7 @@ func (m model) updateContent() model {
 
 	renderer, _ := glamour.NewTermRenderer(
 		glamour.WithAutoStyle(),
+		glamour.WithColorProfile(termenv.ANSI256),
 		glamour.WithWordWrap(contentWidth),
 	)
 

@@ -18,6 +18,9 @@ import (
 	"github.com/charmbracelet/wish/logging"
 	"github.com/vinayakankugoyal/sshresume/pkg/config"
 	"github.com/vinayakankugoyal/sshresume/pkg/teahandler"
+
+	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/termenv"
 )
 
 var (
@@ -27,6 +30,7 @@ var (
 )
 
 func main() {
+	lipgloss.SetColorProfile(termenv.ANSI256)
 	flag.Parse()
 
 	cfg, err := config.Load(*fileDir)
