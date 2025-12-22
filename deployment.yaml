@@ -20,6 +20,15 @@ spec:
         - 0.0.0.0
         ports:
         - containerPort: 23234
+        volumeMounts:
+        - name: host-key
+          mountPath: /app/.ssh
+          readOnly: true
+      volumes:
+      - name: host-key
+        secret:
+          secretName: ssh-host-key
+          defaultMode: 256 # 0400 in octal (read-only for owner) or 384 (0600)
 ---
 
 apiVersion: v1
