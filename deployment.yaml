@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ssh-resume
-        image: us-central1-docker.pkg.dev/murd3rbot/sshresume/sshresume:20251220-cf4db50
+        image: us-central1-docker.pkg.dev/murd3rbot/sshresume/sshresume:20260113-048f3dc@sha256:b435572c701ab6f93a59752de73b82d50d2661b0c90504c7540438a31d39fd21
         args:
         - --host
         - 0.0.0.0
