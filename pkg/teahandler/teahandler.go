@@ -81,7 +81,7 @@ func (m model) flattenTree() []treeItem {
 }
 
 // selectFirstFile finds and selects the first markdown file in the tree.
-func (m *model) selectFirstFile() {
+func (m *model) selectFirstFileAndExpandEverything() {
 	var findFirst func(node *config.TreeNode) string
 
 	findFirst = func(node *config.TreeNode) string {
@@ -105,6 +105,22 @@ func (m *model) selectFirstFile() {
 	}
 
 	m.selectedFile = findFirst(m.tree)
+
+	var expandAll func(node *config.TreeNode)
+	expandAll = func(node *config.TreeNode) {
+		if node == nil {
+			return
+		}
+
+		m.expanded[node.Path] = true
+
+		for _, child := range node.Children {
+			expandAll(child)
+		}
+	}
+
+	expandAll(m.tree)
+
 	m.items = m.flattenTree()
 }
 
@@ -117,7 +133,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Initialize on first update.
 	if !m.ready {
 		m.ready = true
-		m.selectFirstFile()
+		m.selectFirstFileAndExpandEverything()
 		// Initialize viewport with defaults, will be resized immediately if WindowSizeMsg was cached or comes next
 		m.viewport = viewport.New(0, 0)
 		m.viewport.Style = contentStyle
