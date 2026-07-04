@@ -23,3 +23,6 @@ WORKDIR /app
 COPY --from=builder /sshresume /app/sshresume
 COPY --from=builder /app/resume /app/resume
 ENTRYPOINT ["/app/sshresume"]
+# Default to binding all interfaces (needed on Fly.io / any container host).
+# K8s deployment.yaml overrides this via args if still used.
+CMD ["--host", "0.0.0.0"]

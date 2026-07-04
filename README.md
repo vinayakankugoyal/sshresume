@@ -14,7 +14,7 @@ An interactive resume/portfolio accessible via SSH, built with Go and [Charm](ht
 
 Connect to see it in action:
 ```bash
-ssh resume.fullydisfunctional.com
+ssh resume.purelydysfunctional.com
 ```
 
 ## Installation

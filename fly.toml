@@ -1,0 +1,28 @@
+app = "sshresume"
+primary_region = "ewr"
+
+[build]
+
+# Persist the SSH host key across restarts/redeploys so returning
+# visitors don't get "host key changed" warnings. The app writes/reads
+# /app/.ssh/id_ed25519 (generated on first boot if absent).
+[[mounts]]
+  source = "sshkey"
+  destination = "/app/.ssh"
+  initial_size = "1gb"
+
+[[services]]
+  internal_port = 23234
+  protocol = "tcp"
+  # Scale to zero when idle; the Fly proxy wakes the machine on an
+  # incoming connection. Flip auto_stop to "off" + min=1 for always-on.
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[services.ports]]
+    port = 22
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

@@ -12,10 +12,6 @@ pkgs.mkShell {
   buildInputs = [
     gcloud
     pkgs.go
-    pkgs.cowsay
-    pkgs.lolcat
+    pkgs.flyctl
   ];
-  shellHook = ''
-      echo "sshresume" | cowsay | lolcat
-  '';
 }
